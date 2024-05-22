@@ -1,0 +1,63 @@
+package com.example.SysteMall_backend.service;
+
+import com.example.SysteMall_backend.DTOs.CategoryDTO;
+import com.example.SysteMall_backend.entity.Category;
+import com.example.SysteMall_backend.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class CategoryService {
+
+    private final CategoryRepository categoryRepository;
+
+    @Autowired
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
+    public CategoryDTO saveCategory(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        category.setCategoryName(categoryDTO.getCategoryName());
+        category.setCategoryDescription(categoryDTO.getCategoryDescription());
+        Category savedCategory = categoryRepository.save(category);
+        return mapToDTO(savedCategory);
+    }
+
+    public List<CategoryDTO> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<CategoryDTO> getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .map(this::mapToDTO);
+    }
+
+    public CategoryDTO updateCategory(Long id, CategoryDTO updatedCategoryDTO) {
+        return categoryRepository.findById(id)
+                .map(category -> {
+                    category.setCategoryName(updatedCategoryDTO.getCategoryName());
+                    category.setCategoryDescription(updatedCategoryDTO.getCategoryDescription());
+                    return mapToDTO(categoryRepository.save(category));
+                })
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+    }
+
+    public void deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
+    }
+
+    private CategoryDTO mapToDTO(Category category) {
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(category.getId());
+        categoryDTO.setCategoryName(category.getCategoryName());
+        categoryDTO.setCategoryDescription(category.getCategoryDescription());
+        return categoryDTO;
+    }
+}
