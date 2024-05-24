@@ -7,13 +7,12 @@ import com.example.SysteMall_backend.entity.SaleItem;
 import com.example.SysteMall_backend.entity.Sales;
 import com.example.SysteMall_backend.repository.ProductRepository;
 import com.example.SysteMall_backend.repository.SalesRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,38 +29,52 @@ public class SalesService {
         this.productRepository = productRepository;
     }
 
-    @Transactional
-    public SalesDTO createSale(List<Long> productIds, List<Integer> quantities) {
-        if (productIds.size() != quantities.size()) {
-            throw new IllegalArgumentException("Product IDs and quantities must have the same length");
+    // Método para processar a criação de uma venda
+    public SalesDTO createSale(List<SaleItemDTO> itemsSale) {
+        BigDecimal total = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+
+        List<SaleItem> saleItems = new ArrayList<>();
+        for (SaleItemDTO itemDTO : itemsSale) {
+            Product product = productRepository.findById(itemDTO.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+            BigDecimal subtotal;
+            if (Boolean.TRUE.equals(itemDTO.getIsBulk())) { // Verifica se o produto está sendo vendido a granel
+                if (itemDTO.getWeight() == null) {
+                    throw new RuntimeException("O peso do produto a granel não está especificado");
+                }
+                subtotal = product.getProductPrice().multiply(itemDTO.getWeight()).setScale(2, BigDecimal.ROUND_HALF_UP);
+            } else {
+                if (itemDTO.getQuantity() == null) {
+                    throw new RuntimeException("A quantidade do produto não está especificada");
+                }
+                subtotal = product.getProductPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_UP);
+            }
+            total = total.add(subtotal).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+            SaleItem saleItem = new SaleItem();
+            saleItem.setProduct(product);
+            saleItem.setProductPrice(product.getProductPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            saleItem.setQuantity(itemDTO.getQuantity());
+            saleItem.setWeight(itemDTO.getWeight());
+            saleItem.setSubtotal(subtotal);
+            saleItems.add(saleItem);
         }
 
+        // Cria a venda
         Sales sale = new Sales();
-        sale.setSaleDate(LocalDateTime.now());  // Define a data da venda aqui
-
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (int i = 0; i < productIds.size(); i++) {
-            Long productId = productIds.get(i);
-            Integer quantity = quantities.get(i);
-
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-
-            BigDecimal itemTotal = product.getProductPrice().multiply(BigDecimal.valueOf(quantity));
-            total = total.add(itemTotal);
-        }
-
+        sale.setSaleDate(LocalDateTime.now());
+        sale.setSaleItems(saleItems);
         sale.setSaleTotals(total);
+        saleItems.forEach(item -> item.setSale(sale));
+
+        // Salva a venda no banco de dados
         Sales savedSale = salesRepository.save(sale);
 
-        SalesDTO salesDTO = new SalesDTO();
-        salesDTO.setId(savedSale.getId());
-        salesDTO.setSaleDate(savedSale.getSaleDate());
-        salesDTO.setSaleTotals(savedSale.getSaleTotals());
-
-        return salesDTO;
+        // Mapeia a venda para DTO e retorna
+        return mapToDTO(savedSale);
     }
+
 
     public List<SalesDTO> getAllSales() {
         return salesRepository.findAll().stream()
@@ -90,18 +103,42 @@ public class SalesService {
     private SalesDTO mapToDTO(Sales sales) {
         SalesDTO salesDTO = new SalesDTO();
         salesDTO.setId(sales.getId());
+        salesDTO.setProductName(sales.getProductName());
         salesDTO.setSaleDate(sales.getSaleDate());
+        salesDTO.setWeight(salesDTO.getWeight());
         salesDTO.setSaleTotals(sales.getSaleTotals());
+
+        salesDTO.setItems(sales.getSaleItems().stream()
+                .map(this::mapToSaleItemDTO)
+                .collect(Collectors.toList()));
         return salesDTO;
     }
+
+    private SaleItemDTO mapToSaleItemDTO(SaleItem saleItem) {
+        SaleItemDTO saleItemDTO = new SaleItemDTO();
+        saleItemDTO.setId(saleItem.getId());
+        saleItemDTO.setProductName(saleItem.getProduct().getProductName());
+        saleItemDTO.setProductId(saleItem.getProduct().getId());
+        saleItemDTO.setProductPrice(saleItem.getProductPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+        saleItemDTO.setQuantity(saleItem.getQuantity());
+        saleItemDTO.setWeight(saleItem.getWeight() != null ? saleItem.getWeight().setScale(2, BigDecimal.ROUND_HALF_UP) : null);
+        saleItemDTO.setSubtotal(saleItem.getSubtotal().setScale(2, BigDecimal.ROUND_HALF_UP));
+        saleItemDTO.setIsBulk(saleItem.getWeight() != null); // Set isBulk based on weight presence
+        return saleItemDTO;
+    }
+
 
     private BigDecimal calculateSaleTotals(SalesDTO salesDTO) {
         BigDecimal total = BigDecimal.ZERO;
         for (SaleItemDTO item : salesDTO.getItems()) {
-            BigDecimal itemTotal = item.getProductPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal itemTotal;
+            if (Boolean.TRUE.equals(item.getIsBulk())) {
+                itemTotal = item.getProductPrice().multiply(item.getWeight());
+            } else {
+                itemTotal = item.getProductPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            }
             total = total.add(itemTotal);
         }
         return total;
     }
-
 }

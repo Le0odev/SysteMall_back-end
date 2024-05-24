@@ -1,5 +1,6 @@
 package com.example.SysteMall_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class SaleItem {
 
     @ManyToOne
     @JoinColumn(name = "venda_id", nullable = false)
+    @JsonBackReference
     private Sales sale;
 
     @ManyToOne
@@ -27,14 +29,18 @@ public class SaleItem {
     @Column(nullable = false)
     private BigDecimal productPrice;
 
-    @Column(nullable = false)
-    private int quantity;
+    @Column(nullable = true)
+    private Integer quantity;
+
+    private BigDecimal weight;
 
     private BigDecimal subtotal;
 
-    public void calculateSubtotal() {
-        this.subtotal = product.getProductPrice().multiply(BigDecimal.valueOf(quantity));
-    }
+
+
+
+
+
 
 
 }

@@ -12,11 +12,13 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SalesDTO{
+public class SalesDTO {
 
     private Long id;
+    private String productName;
     private LocalDateTime saleDate;
     private BigDecimal saleTotals;
     private List<SaleItemDTO> items;
+    private BigDecimal weight;
 
 }

@@ -1,7 +1,10 @@
 package com.example.SysteMall_backend.controller;
 
+import com.example.SysteMall_backend.DTOs.SaleItemDTO;
 import com.example.SysteMall_backend.DTOs.SalesDTO;
+import com.example.SysteMall_backend.entity.SaleItem;
 import com.example.SysteMall_backend.entity.SaleRequest;
+import com.example.SysteMall_backend.entity.Sales;
 import com.example.SysteMall_backend.service.SalesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,9 +27,9 @@ public class SaleController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<SalesDTO> createSale(@RequestBody SaleRequest createSaleRequest) {
-        SalesDTO saleDTO = salesService.createSale(createSaleRequest.getProductIds(), createSaleRequest.getQuantities());
-        return new ResponseEntity<>(saleDTO, HttpStatus.CREATED);
+    public ResponseEntity<SalesDTO> createSale(@RequestBody List<SaleItemDTO> itemsSale) {
+        SalesDTO createdSale = salesService.createSale(itemsSale);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSale);
     }
 
 

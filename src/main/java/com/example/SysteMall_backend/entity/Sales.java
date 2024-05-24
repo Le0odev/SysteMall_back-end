@@ -1,13 +1,14 @@
 package com.example.SysteMall_backend.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,6 +21,8 @@ public class Sales {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String productName;
+
     @Column(nullable = false)
     private LocalDateTime saleDate;
 
@@ -27,14 +30,11 @@ public class Sales {
     private BigDecimal saleTotals;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<SaleItem> saleItems;
 
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SaleItem> items = new ArrayList<>();
 
-    public void addItem(SaleItem item) {
-        items.add(item);
-        item.setSale(this);
-    }
+
+
 
 }
