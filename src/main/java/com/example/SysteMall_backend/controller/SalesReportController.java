@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -24,15 +23,23 @@ public class SalesReportController {
         this.salesReportService = salesReportService;
     }
 
-
+    @PostMapping
+    public ResponseEntity<Sales> createSale(@RequestBody Sales sale) {
+        Sales createdSale = salesReportService.createSale(sale);
+        return new ResponseEntity<>(createdSale, HttpStatus.CREATED);
+    }
 
     @GetMapping("/day/{date}")
-    public ResponseEntity<BigDecimal> getTotalSalesByDay(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime) {
-        LocalDate date = dateTime.toLocalDate(); // Convertendo para LocalDate
+    public ResponseEntity<List<Sales>> getSalesByDay(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        List<Sales> sales = salesReportService.getSalesByDay(date);
+        return new ResponseEntity<>(sales, HttpStatus.OK);
+    }
+
+    @GetMapping("/day/total/{date}")
+    public ResponseEntity<BigDecimal> getTotalSalesByDay(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         BigDecimal totalSales = salesReportService.getTotalSalesByDay(date);
         return new ResponseEntity<>(totalSales, HttpStatus.OK);
     }
-
 
     @GetMapping("/month/{year}/{month}")
     public ResponseEntity<BigDecimal> getTotalSalesByMonth(@PathVariable int year, @PathVariable int month) {

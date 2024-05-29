@@ -100,6 +100,7 @@ public class SalesService {
         salesRepository.deleteById(id);
     }
 
+    public void deleteAllSales() {salesRepository.deleteAll();}
     private SalesDTO mapToDTO(Sales sales) {
         SalesDTO salesDTO = new SalesDTO();
         salesDTO.setId(sales.getId());

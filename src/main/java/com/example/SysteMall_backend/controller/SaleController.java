@@ -61,4 +61,12 @@ public class SaleController {
         salesService.deleteSales(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @DeleteMapping("/delete/all")
+    public  ResponseEntity<Void> deleteAllSale(){
+        salesService.deleteAllSales();
+        return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
 }
