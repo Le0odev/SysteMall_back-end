@@ -3,6 +3,7 @@ package com.example.SysteMall_backend.controller;
 
 import com.example.SysteMall_backend.DTOs.LoginRequestDTO;
 import com.example.SysteMall_backend.DTOs.LoginResponseDTO;
+import com.example.SysteMall_backend.entity.Role;
 import com.example.SysteMall_backend.entity.User;
 import com.example.SysteMall_backend.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 
@@ -41,13 +43,22 @@ public class TokenController {
 
 
            var now = Instant.now();
-           var expiresIn = 300L;
+           var expiresIn = 3000000L;
+
+           var scopes = userOptional.get().getRoles()
+                   .stream()
+                   .map(Role::getName)
+                   .collect(Collectors.joining(" "));
+
+
+
            var claims = JwtClaimsSet.builder()
                    .issuer("mybackend")
                    .subject(userOptional.get().getId().toString())
                    .expiresAt(now.plusSeconds(expiresIn))
                    .issuedAt(now)
                    .expiresAt(now.plusSeconds(expiresIn))
+                   .claim("scope", scopes)
                    .build();
 
            var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
