@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-
+@CrossOrigin(origins = "http://localhost:5173") // Adicione o domínio do frontend
 public class TokenController {
 
     private JwtEncoder jwtEncoder;
@@ -43,7 +44,7 @@ public class TokenController {
 
 
            var now = Instant.now();
-           var expiresIn = 3000000L;
+           var expiresIn = 9000000000L;
 
            var scopes = userOptional.get().getRoles()
                    .stream()

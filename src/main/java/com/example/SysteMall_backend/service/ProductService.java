@@ -33,6 +33,7 @@ public class ProductService {
         product.setProductDescription(productDTO.getProductDescription());
         product.setProductPrice(productDTO.getProductPrice());
         product.setProductQuantity(productDTO.getProductQuantity());
+        product.setCodeBar(productDTO.getCodeBar());
 
         if (productDTO.getCategoryId() != null) {
             Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
@@ -64,6 +65,7 @@ public class ProductService {
                     product.setProductDescription(updatedProductDTO.getProductDescription());
                     product.setProductPrice(updatedProductDTO.getProductPrice());
                     product.setProductQuantity(updatedProductDTO.getProductQuantity());
+                    product.setCodeBar(updatedProductDTO.getCodeBar());
 
                     if (updatedProductDTO.getCategoryId() != null) {
                         Optional<Category> category = categoryRepository.findById(updatedProductDTO.getCategoryId());
@@ -87,6 +89,7 @@ public class ProductService {
         productDTO.setProductDescription(product.getProductDescription());
         productDTO.setProductPrice(product.getProductPrice());
         productDTO.setProductQuantity(product.getProductQuantity());
+        productDTO.setCodeBar(product.getCodeBar());
         if (product.getCategory() != null) {
             productDTO.setCategoryId(product.getCategory().getId());
         }

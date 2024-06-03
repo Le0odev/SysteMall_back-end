@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/report")
+@CrossOrigin(origins = "http://localhost:5173") // Adicione o domínio do frontend
 public class SalesReportController {
 
     private final SalesReportService salesReportService;

@@ -15,6 +15,8 @@ public class CadProductDTO {
     private BigDecimal productPrice;
     private Integer productQuantity;
     private Long categoryId;
+    private String codeBar;
+
 
 
 }

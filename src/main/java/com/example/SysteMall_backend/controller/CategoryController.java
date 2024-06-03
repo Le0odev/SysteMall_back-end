@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
+
 @RestController
 @RequestMapping("/categorias")
+@CrossOrigin(origins = "http://localhost:5173") // Adicione o domínio do frontend
 public class CategoryController {
 
     private final CategoryService categoryService;

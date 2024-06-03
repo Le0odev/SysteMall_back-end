@@ -17,6 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/sales")
+@CrossOrigin(origins = "http://localhost:5173") // Adicione o domínio do frontend
 public class SaleController {
 
     private final SalesService salesService;

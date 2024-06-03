@@ -24,6 +24,9 @@ public class Product {
     private String productName;
 
     @Column(nullable = true)
+    private String codeBar;
+
+    @Column(nullable = true)
     private String productDescription;
 
     @Column(nullable = false)
@@ -31,6 +34,8 @@ public class Product {
 
     @Column(name = "estoque_quant")
     private Integer productQuantity;
+
+
 
     @ManyToOne
     @JoinColumn(name = "category_id")

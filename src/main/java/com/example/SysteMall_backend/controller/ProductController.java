@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/produtos")
+@RequestMapping("/products")
+@CrossOrigin(origins = "http://localhost:5173") // Adicione o domínio do frontend
 public class ProductController {
 
     private final ProductService productService;
