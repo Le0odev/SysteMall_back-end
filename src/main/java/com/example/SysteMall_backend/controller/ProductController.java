@@ -1,6 +1,7 @@
 package com.example.SysteMall_backend.controller;
 
 import com.example.SysteMall_backend.DTOs.CadProductDTO;
+import com.example.SysteMall_backend.entity.Product;
 import com.example.SysteMall_backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,12 @@ public class ProductController {
         return productService.getProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> getProductsByName(@RequestParam String productName) {
+        List<Product> products = productService.getProductsByName(productName);
+        return ResponseEntity.ok(products);
     }
 
 

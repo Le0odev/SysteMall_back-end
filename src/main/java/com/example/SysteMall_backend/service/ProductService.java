@@ -58,6 +58,10 @@ public class ProductService {
                 .map(this::mapToDTO);
     }
 
+    public List<Product> getProductsByName(String productName) {
+        return productRepository.findByProductNameContainingIgnoreCase(productName);
+    }
+
     public CadProductDTO updateProduct(Long id, CadProductDTO updatedProductDTO) {
         return productRepository.findById(id)
                 .map(product -> {
