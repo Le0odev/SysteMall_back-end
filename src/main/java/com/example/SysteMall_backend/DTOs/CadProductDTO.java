@@ -18,7 +18,11 @@ public class CadProductDTO {
     private String codeBar;
 
 
+    public void setCategoryName(String categoryName) {
+    }
 
+    public void setCategoryDescription(String categoryDescription) {
+    }
 }
 
 

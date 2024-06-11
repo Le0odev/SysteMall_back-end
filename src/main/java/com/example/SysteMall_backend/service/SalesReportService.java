@@ -24,6 +24,7 @@ public class SalesReportService {
         return salesRepository.save(sale);
     }
 
+
     public List<Sales> getSalesByDay(LocalDate day) {
         LocalDateTime startOfDay = day.atStartOfDay();
         LocalDateTime endOfDay = day.atTime(23, 59, 59);

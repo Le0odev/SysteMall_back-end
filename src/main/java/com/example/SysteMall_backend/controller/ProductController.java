@@ -43,6 +43,13 @@ public class ProductController {
         }
     }
 
+    @DeleteMapping("/delete/all")
+    public ResponseEntity<Void> deleteAll() {
+        productService.deleteAllProduct();
+        return ResponseEntity.noContent().build();
+    }
+
+
     @PutMapping("/{id}")
     public ResponseEntity<CadProductDTO> updateProduct(@PathVariable Long id, @RequestBody CadProductDTO productDTO) {
         try {
@@ -54,10 +61,11 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> getProductsByName(@RequestParam String productName) {
-        List<Product> products = productService.getProductsByName(productName);
-        return ResponseEntity.ok(products);
+    public List<Product> searchProducts(@RequestParam String productName, @RequestParam(required = false) Long categoryId) {
+        return productService.searchProducts(productName, categoryId);
     }
+
+
 
 
 }

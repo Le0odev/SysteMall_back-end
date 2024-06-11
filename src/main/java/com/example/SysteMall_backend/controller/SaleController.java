@@ -22,6 +22,8 @@ public class SaleController {
 
     private final SalesService salesService;
 
+
+
     @Autowired
     public SaleController(SalesService salesService) {
         this.salesService = salesService;

@@ -58,7 +58,10 @@ public class ProductService {
                 .map(this::mapToDTO);
     }
 
-    public List<Product> getProductsByName(String productName) {
+    public List<Product> searchProducts(String productName, Long categoryId) {
+        if (categoryId != null && categoryId != 0){
+            return productRepository.findByProductNameContainingIgnoreCaseAndCategoryId(productName, categoryId);
+        }
         return productRepository.findByProductNameContainingIgnoreCase(productName);
     }
 
@@ -85,6 +88,8 @@ public class ProductService {
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
+
+    public void deleteAllProduct() {productRepository.deleteAll();}
 
     private CadProductDTO mapToDTO(Product product) {
         CadProductDTO productDTO = new CadProductDTO();
