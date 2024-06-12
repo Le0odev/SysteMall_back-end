@@ -13,8 +13,8 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/categorias")
-@CrossOrigin(origins = "http://localhost:5173") // Adicione o domínio do frontend
+@RequestMapping("/category")
+@CrossOrigin(origins = "http://localhost:5173")
 public class CategoryController {
 
     private final CategoryService categoryService;
