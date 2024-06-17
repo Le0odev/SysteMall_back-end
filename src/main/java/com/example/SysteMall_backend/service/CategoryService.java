@@ -2,6 +2,7 @@ package com.example.SysteMall_backend.service;
 
 import com.example.SysteMall_backend.DTOs.CategoryDTO;
 import com.example.SysteMall_backend.entity.Category;
+import com.example.SysteMall_backend.entity.Product;
 import com.example.SysteMall_backend.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,13 @@ public class CategoryService {
     public Optional<CategoryDTO> getCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .map(this::mapToDTO);
+    }
+
+    public List<Category> searchCategory(String categoryName, Long id) {
+        if (id != null && id != 0) {
+            return categoryRepository.findByCategoryNameContainingIgnoreCaseAndId(categoryName, id);
+        }
+        return categoryRepository.findByCategoryNameContainingIgnoreCase(categoryName);
     }
 
     public CategoryDTO updateCategory(Long id, CategoryDTO updatedCategoryDTO) {

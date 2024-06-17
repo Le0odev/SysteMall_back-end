@@ -1,6 +1,8 @@
 package com.example.SysteMall_backend.controller;
 
 import com.example.SysteMall_backend.DTOs.CategoryDTO;
+import com.example.SysteMall_backend.entity.Category;
+import com.example.SysteMall_backend.entity.Product;
 import com.example.SysteMall_backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,4 +55,10 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public List<Category> searchCategory(@RequestParam String categoryName, @RequestParam(required = false) Long id) {
+        return categoryService.searchCategory(categoryName, id);
+    }
+
 }
