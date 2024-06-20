@@ -29,12 +29,13 @@ public class SalesService {
         this.productRepository = productRepository;
     }
 
-    // Método para processar a criação de uma venda
+
     public SalesDTO createSale(List<SaleItemDTO> itemsSale) {
         BigDecimal total = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 
         List<SaleItem> saleItems = new ArrayList<>();
         for (SaleItemDTO itemDTO : itemsSale) {
+            // Validações adicionais podem ser incluídas aqui
             Product product = productRepository.findById(itemDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 

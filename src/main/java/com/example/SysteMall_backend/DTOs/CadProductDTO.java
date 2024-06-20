@@ -16,12 +16,15 @@ public class CadProductDTO {
     private Integer productQuantity;
     private Long categoryId;
     private String codeBar;
-
+    private boolean bulk;
 
     public void setCategoryName(String categoryName) {
     }
 
     public void setCategoryDescription(String categoryDescription) {
+    }
+
+    public void setIsBulk(boolean bulk) {
     }
 }
 

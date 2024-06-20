@@ -35,14 +35,14 @@ public class Product {
     @Column(name = "estoque_quant")
     private Integer productQuantity;
 
-
+    private boolean isBulk;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonIgnore
     private Category category;
 
-    private boolean isBulk;
+
 
 
 }

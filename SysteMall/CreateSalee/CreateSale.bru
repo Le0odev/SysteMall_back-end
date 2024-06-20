@@ -6,6 +6,34 @@ meta {
 
 post {
   url: http://localhost:8080/sales/create
-  body: none
-  auth: none
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{acessToken}}
+}
+
+body:json {
+  [
+      {
+          "productId": 60,
+          "quantity": null,
+          "weight": 0.5,
+          "isBulk": true
+      },
+      {
+          "productId": 60,
+          "quantity": null,
+          "weight": 0.5,
+          "isBulk": true
+      },
+      {
+          "productId": 60,
+          "quantity": null,
+          "weight": 0.5,
+          "isBulk": true
+      }
+  ]
+  
 }

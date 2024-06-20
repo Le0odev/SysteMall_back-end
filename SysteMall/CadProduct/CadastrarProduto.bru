@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/produtos/cadastrar
+  url: http://localhost:8080/products/cadastrar
   body: json
   auth: bearer
 }
@@ -17,14 +17,12 @@ auth:bearer {
 body:json {
   {
     "productName": "Produto de Exemplo",
-    "productDescription": "1434234234234234",
-    "codeBar": "7898930642529",
-    
-    "productPrice": 30,
+    "productDescription": "Descrição do produto de exemplo",
+    "productPrice": 30.0,
     "productQuantity": 100,
-    "categoryId": 6
-    
+    "categoryId": 6,
+    "codeBar": "7898930642529",
+    "bulk": true
   }
-  
   
 }
