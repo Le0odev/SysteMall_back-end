@@ -17,6 +17,7 @@ public class CadProductDTO {
     private Long categoryId;
     private String codeBar;
     private boolean bulk;
+    private String imageUrl;
 
     public void setCategoryName(String categoryName) {
     }

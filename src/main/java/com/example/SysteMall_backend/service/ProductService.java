@@ -30,7 +30,8 @@ public class ProductService {
         product.setProductDescription(productDTO.getProductDescription());
         product.setProductPrice(productDTO.getProductPrice());
         product.setCodeBar(productDTO.getCodeBar());
-        product.setBulk(productDTO.isBulk()); // Definindo o campo isBulk
+        product.setBulk(productDTO.isBulk());
+        product.setImageUrl(productDTO.getImageUrl());
 
         if (productDTO.getCategoryId() != null) {
             Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
@@ -49,6 +50,7 @@ public class ProductService {
                     product.setProductPrice(updatedProductDTO.getProductPrice());
                     product.setCodeBar(updatedProductDTO.getCodeBar());
                     product.setBulk(updatedProductDTO.isBulk()); // Atualizando o campo isBulk
+                    product.setImageUrl(updatedProductDTO.getImageUrl());
 
                     if (updatedProductDTO.getCategoryId() != null) {
                         Optional<Category> category = categoryRepository.findById(updatedProductDTO.getCategoryId());
@@ -68,7 +70,8 @@ public class ProductService {
         productDTO.setProductDescription(product.getProductDescription());
         productDTO.setProductPrice(product.getProductPrice());
         productDTO.setCodeBar(product.getCodeBar());
-        productDTO.setBulk(product.isBulk()); // Mapeando o campo isBulk para DTO
+        productDTO.setBulk(product.isBulk());
+        productDTO.setImageUrl(product.getImageUrl());
 
         if (product.getCategory() != null) {
             productDTO.setCategoryId(product.getCategory().getId());
@@ -93,6 +96,14 @@ public class ProductService {
             return productRepository.findByProductNameContainingIgnoreCaseAndCategoryId(productName, categoryId);
         }
         return productRepository.findByProductNameContainingIgnoreCase(productName);
+    }
+
+    public List<Product> searchByCodeBar(String codeBar, Long categoryId) {
+
+        if (categoryId != null && categoryId != 0) {
+            return productRepository.findByCodeBarAndCategoryId(codeBar, categoryId);
+        }
+         return productRepository.findByCodeBar(codeBar);
     }
 
     public void deleteProduct(Long id) {

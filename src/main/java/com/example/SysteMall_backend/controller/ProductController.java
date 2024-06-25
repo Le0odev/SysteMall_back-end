@@ -60,12 +60,19 @@ public class ProductController {
         }
     }
 
+
+
+
+
     @GetMapping("/search")
     public List<Product> searchProducts(@RequestParam String productName, @RequestParam(required = false) Long categoryId) {
         return productService.searchProducts(productName, categoryId);
     }
 
-
+    @GetMapping("/search/codebar")
+    public List<Product> searchByCodeBar(@RequestParam String codeBar, @RequestParam(required = false) Long categoryId) {
+        return productService.searchByCodeBar(codeBar, categoryId);
+    }
 
 
 }

@@ -35,6 +35,10 @@ public class Product {
     @Column(name = "estoque_quant")
     private Integer productQuantity;
 
+    @Column(name = "image_url")
+
+    private String imageUrl;
+
     private boolean isBulk;
 
     @ManyToOne
