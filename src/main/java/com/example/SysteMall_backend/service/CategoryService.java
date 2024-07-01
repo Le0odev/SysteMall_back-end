@@ -2,10 +2,13 @@ package com.example.SysteMall_backend.service;
 
 import com.example.SysteMall_backend.DTOs.CategoryDTO;
 import com.example.SysteMall_backend.entity.Category;
-import com.example.SysteMall_backend.entity.Product;
 import com.example.SysteMall_backend.repository.CategoryRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +38,12 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
+    public Page<CategoryDTO> getAllCategories(Pageable pageable) {
+        return categoryRepository.findByCategoryNameContainingIgnoreCase("", pageable)
+                .map(this::mapToDTO);
+    }
+
+
     public Optional<CategoryDTO> getCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .map(this::mapToDTO);
@@ -60,6 +69,9 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         categoryRepository.deleteById(id);
     }
+
+    public void deleteAllCategory() {categoryRepository.deleteAll();}
+
 
     private CategoryDTO mapToDTO(Category category) {
         CategoryDTO categoryDTO = new CategoryDTO();

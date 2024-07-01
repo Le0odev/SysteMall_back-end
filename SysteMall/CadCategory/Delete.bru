@@ -1,0 +1,15 @@
+meta {
+  name: Delete
+  type: http
+  seq: 1
+}
+
+delete {
+  url: http://localhost:8080/category/all
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{acessToken}}
+}

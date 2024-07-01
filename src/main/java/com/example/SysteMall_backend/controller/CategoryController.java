@@ -4,10 +4,13 @@ import com.example.SysteMall_backend.DTOs.CategoryDTO;
 import com.example.SysteMall_backend.entity.Category;
 import com.example.SysteMall_backend.entity.Product;
 import com.example.SysteMall_backend.service.CategoryService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +35,9 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
     }
 
-    @GetMapping
-    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
-        List<CategoryDTO> categories = categoryService.getAllCategories();
+    @GetMapping("/pages")
+    public ResponseEntity<Page<CategoryDTO>> getAllCategoriesPage(Pageable pageable) {
+        Page<CategoryDTO> categories = categoryService.getAllCategories(pageable);
         return ResponseEntity.ok(categories);
     }
 
@@ -55,6 +58,21 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<Void> deleteAll() {
+        categoryService.deleteAllCategory();
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+        List<CategoryDTO> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
+    }
+
+
+
 
     @GetMapping("/search")
     public List<Category> searchCategory(@RequestParam String categoryName, @RequestParam(required = false) Long id) {
