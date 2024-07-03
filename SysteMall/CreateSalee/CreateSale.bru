@@ -15,25 +15,21 @@ auth:bearer {
 }
 
 body:json {
-  [
+  {
+    "itemsSale": [
       {
-          "productId": 60,
-          "quantity": null,
-          "weight": 0.5,
-          "isBulk": true
+        "productId": 10,
+        "quantity": 2,
+        "isBulk": false
       },
       {
-          "productId": 60,
-          "quantity": null,
-          "weight": 0.5,
-          "isBulk": true
-      },
-      {
-          "productId": 60,
-          "quantity": null,
-          "weight": 0.5,
-          "isBulk": true
+        "productId": 10,
+        "quantity": 1,
+        "isBulk": false
       }
-  ]
+    ],
+    "discount": 10,
+    "methodPayment": "Cart343Crédito"
+  }
   
 }

@@ -32,6 +32,8 @@ public class SaleItem {
     @Column(nullable = true)
     private Integer quantity;
 
+
+
     private BigDecimal weight;
 
     private BigDecimal subtotal;

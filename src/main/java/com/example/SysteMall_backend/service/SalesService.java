@@ -1,5 +1,6 @@
 package com.example.SysteMall_backend.service;
 
+import com.example.SysteMall_backend.DTOs.CreateSaleRequest;
 import com.example.SysteMall_backend.DTOs.SaleItemDTO;
 import com.example.SysteMall_backend.DTOs.SalesDTO;
 import com.example.SysteMall_backend.entity.Product;
@@ -29,18 +30,16 @@ public class SalesService {
         this.productRepository = productRepository;
     }
 
-
-    public SalesDTO createSale(List<SaleItemDTO> itemsSale) {
+    public SalesDTO createSale(CreateSaleRequest request) {
         BigDecimal total = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 
         List<SaleItem> saleItems = new ArrayList<>();
-        for (SaleItemDTO itemDTO : itemsSale) {
-            // Validações adicionais podem ser incluídas aqui
+        for (SaleItemDTO itemDTO : request.getItemsSale()) {
             Product product = productRepository.findById(itemDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
             BigDecimal subtotal;
-            if (Boolean.TRUE.equals(itemDTO.getIsBulk())) { // Verifica se o produto está sendo vendido a granel
+            if (Boolean.TRUE.equals(itemDTO.getIsBulk())) {
                 if (itemDTO.getWeight() == null) {
                     throw new RuntimeException("O peso do produto a granel não está especificado");
                 }
@@ -62,11 +61,21 @@ public class SalesService {
             saleItems.add(saleItem);
         }
 
+        // Aplica o desconto percentual se fornecido
+        BigDecimal discount = request.getDiscount() != null ? request.getDiscount() : BigDecimal.ZERO;
+        if (discount != null && discount.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal discountAmount = total.multiply(discount).divide(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
+            total = total.subtract(discountAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+
         // Cria a venda
         Sales sale = new Sales();
         sale.setSaleDate(LocalDateTime.now());
         sale.setSaleItems(saleItems);
         sale.setSaleTotals(total);
+        sale.setDiscount(discount);
+        sale.setMethodPayment(request.getMethodPayment() != null ? request.getMethodPayment() : "Não especificado");
+
         saleItems.forEach(item -> item.setSale(sale));
 
         // Salva a venda no banco de dados
@@ -75,7 +84,6 @@ public class SalesService {
         // Mapeia a venda para DTO e retorna
         return mapToDTO(savedSale);
     }
-
 
     public List<SalesDTO> getAllSales() {
         return salesRepository.findAll().stream()
@@ -101,14 +109,17 @@ public class SalesService {
         salesRepository.deleteById(id);
     }
 
-    public void deleteAllSales() {salesRepository.deleteAll();}
+    public void deleteAllSales() {
+        salesRepository.deleteAll();
+    }
+
     private SalesDTO mapToDTO(Sales sales) {
         SalesDTO salesDTO = new SalesDTO();
         salesDTO.setId(sales.getId());
-        salesDTO.setProductName(sales.getProductName());
         salesDTO.setSaleDate(sales.getSaleDate());
-        salesDTO.setWeight(salesDTO.getWeight());
         salesDTO.setSaleTotals(sales.getSaleTotals());
+        salesDTO.setDiscount(sales.getDiscount());
+        salesDTO.setMethodPayment(sales.getMethodPayment());
 
         salesDTO.setItems(sales.getSaleItems().stream()
                 .map(this::mapToSaleItemDTO)
@@ -126,9 +137,9 @@ public class SalesService {
         saleItemDTO.setWeight(saleItem.getWeight() != null ? saleItem.getWeight().setScale(2, BigDecimal.ROUND_HALF_UP) : null);
         saleItemDTO.setSubtotal(saleItem.getSubtotal().setScale(2, BigDecimal.ROUND_HALF_UP));
         saleItemDTO.setIsBulk(saleItem.getWeight() != null); // Set isBulk based on weight presence
+
         return saleItemDTO;
     }
-
 
     private BigDecimal calculateSaleTotals(SalesDTO salesDTO) {
         BigDecimal total = BigDecimal.ZERO;
@@ -141,6 +152,7 @@ public class SalesService {
             }
             total = total.add(itemTotal);
         }
-        return total;
+        BigDecimal discountAmount = total.multiply(salesDTO.getDiscount()).divide(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return total.subtract(discountAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.SysteMall_backend.controller;
 
+import com.example.SysteMall_backend.DTOs.CreateSaleRequest;
 import com.example.SysteMall_backend.DTOs.SaleItemDTO;
 import com.example.SysteMall_backend.DTOs.SalesDTO;
 import com.example.SysteMall_backend.entity.SaleItem;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,11 +32,10 @@ public class SaleController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<SalesDTO> createSale(@RequestBody List<SaleItemDTO> itemsSale) {
-        SalesDTO createdSale = salesService.createSale(itemsSale);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdSale);
+    public ResponseEntity<SalesDTO> createSale(@RequestBody CreateSaleRequest request) {
+        SalesDTO salesDTO = salesService.createSale(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(salesDTO);
     }
-
 
     @GetMapping("/all")
     public ResponseEntity<List<SalesDTO>> getAllSales() {

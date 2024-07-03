@@ -20,5 +20,7 @@ public class SalesDTO {
     private BigDecimal saleTotals;
     private List<SaleItemDTO> items;
     private BigDecimal weight;
+    private BigDecimal discount;
+    private String methodPayment;
 
 }

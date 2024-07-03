@@ -29,6 +29,15 @@ public class Sales {
     @Column
     private BigDecimal saleTotals;
 
+    @Column
+    private BigDecimal discount;
+
+    @Column
+    private String methodPayment;
+
+
+
+
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<SaleItem> saleItems;

@@ -21,6 +21,8 @@ public class SaleItemDTO {
     private BigDecimal subtotal;
     private Boolean isBulk;
 
+
+
     public void setProductPrice(BigDecimal productPrice) {
         this.productPrice = productPrice.setScale(2, BigDecimal.ROUND_HALF_UP); //tirar imprecisao
     }
