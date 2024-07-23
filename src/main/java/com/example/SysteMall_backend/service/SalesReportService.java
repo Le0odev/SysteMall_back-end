@@ -47,6 +47,12 @@ public class SalesReportService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+
+
+    public List<Sales> getSalesByPeriod(LocalDate startDate, LocalDate endDate) {
+        return salesRepository.findBySaleDateBetween(startDate.atStartOfDay(), endDate.atStartOfDay());
+    }
+
     public List<Sales> getAllSales() {
         return salesRepository.findAll();
     }

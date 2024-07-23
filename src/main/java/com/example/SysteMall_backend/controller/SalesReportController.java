@@ -54,5 +54,14 @@ public class SalesReportController {
         return new ResponseEntity<>(allSales, HttpStatus.OK);
     }
 
-    // Outros endpoints conforme necessário
+    @GetMapping("/period")
+    public ResponseEntity<List<Sales>> getSalesByPeriod(@RequestParam String startDate, @RequestParam String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        List<Sales> sales = salesReportService.getSalesByPeriod(start, end);
+        return new ResponseEntity<>(sales, HttpStatus.OK);
+    }
+
+
+
 }

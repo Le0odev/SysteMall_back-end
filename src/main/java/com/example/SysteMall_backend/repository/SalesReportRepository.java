@@ -14,4 +14,5 @@ public interface SalesReportRepository extends JpaRepository<SalesReport, Long>{
     List<Sales>findByDate(LocalDate date);
 
 
+
 }
