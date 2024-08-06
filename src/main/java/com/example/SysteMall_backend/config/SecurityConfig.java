@@ -39,15 +39,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // Configure JWT authentication converter if needed
+
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        // You can further customize the jwtAuthenticationConverter if needed
 
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/users").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/public/catalog").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/public/catalog/search").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/public/catalog/categories").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/public/categories/search").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

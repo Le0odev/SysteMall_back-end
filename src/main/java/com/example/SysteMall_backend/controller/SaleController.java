@@ -45,20 +45,12 @@ public class SaleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SalesDTO> getSaleById(@PathVariable Long id) {
-        Optional<SalesDTO> optionalSale = salesService.getSalesById(id);
-        return optionalSale.map(salesDTO -> new ResponseEntity<>(salesDTO, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        SalesDTO salesDTO = salesService.getSalesById(id);
+        return ResponseEntity.ok(salesDTO);
     }
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<SalesDTO> updateSale(@PathVariable Long id, @RequestBody SalesDTO updatedSaleDTO) {
-        SalesDTO updatedSale = salesService.updateSales(id, updatedSaleDTO);
-        if (updatedSale != null) {
-            return new ResponseEntity<>(updatedSale, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSale(@PathVariable Long id) {

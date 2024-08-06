@@ -14,12 +14,13 @@ public class SaleItemDTO {
 
     private Long id;
     private String productName;
-    private Long productId;
+    private Long productId; // Verifique se está sendo corretamente preenchido
     private BigDecimal productPrice;
     private Integer quantity;
-    private BigDecimal weight; // Adicionando a propriedade weight para representar o peso
+    private BigDecimal weight;
     private BigDecimal subtotal;
-    private Boolean isBulk;
+    private Boolean isBulk; // Verifique se está sendo corretamente preenchido]
+
 
 
 

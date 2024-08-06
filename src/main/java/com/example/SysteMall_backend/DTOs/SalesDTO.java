@@ -22,5 +22,7 @@ public class SalesDTO {
     private BigDecimal weight;
     private BigDecimal discount;
     private String methodPayment;
+    private List<SaleItemDTO> itemss; // Lista de itens da venda
+
 
 }

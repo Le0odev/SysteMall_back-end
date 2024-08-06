@@ -46,7 +46,9 @@ public class Product {
     @JsonIgnore
     private Category category;
 
-
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<SaleItem> saleItems;
 
 
 }

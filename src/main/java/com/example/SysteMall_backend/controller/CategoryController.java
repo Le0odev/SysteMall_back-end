@@ -72,8 +72,6 @@ public class CategoryController {
     }
 
 
-
-
     @GetMapping("/search")
     public List<Category> searchCategory(@RequestParam String categoryName, @RequestParam(required = false) Long id) {
         return categoryService.searchCategory(categoryName, id);

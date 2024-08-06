@@ -22,7 +22,7 @@ public class SaleItem {
     @JsonBackReference
     private Sales sale;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "produto_id", nullable = false)
     private Product product;
 
@@ -32,17 +32,9 @@ public class SaleItem {
     @Column(nullable = true)
     private Integer quantity;
 
-
+    private String productName;
 
     private BigDecimal weight;
 
     private BigDecimal subtotal;
-
-
-
-
-
-
-
-
 }
