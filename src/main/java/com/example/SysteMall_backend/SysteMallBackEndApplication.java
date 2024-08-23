@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SysteMallBackEndApplication {
+public class 	SysteMallBackEndApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SysteMallBackEndApplication.class, args);
