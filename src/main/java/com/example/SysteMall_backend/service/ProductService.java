@@ -32,6 +32,9 @@ public class ProductService {
         product.setCodeBar(productDTO.getCodeBar());
         product.setBulk(productDTO.isBulk());
         product.setImageUrl(productDTO.getImageUrl());
+        product.setProductQuantity(productDTO.getProductQuantity());
+        product.setEstoquePeso((productDTO.getEstoquePeso()));
+        product.setStockAlertLimit(productDTO.getStockAlertLimit());
 
         if (productDTO.getCategoryId() != null) {
             Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
@@ -51,6 +54,9 @@ public class ProductService {
                     product.setCodeBar(updatedProductDTO.getCodeBar());
                     product.setBulk(updatedProductDTO.isBulk()); // Atualizando o campo isBulk
                     product.setImageUrl(updatedProductDTO.getImageUrl());
+                    product.setProductQuantity(updatedProductDTO.getProductQuantity()); // Atualizando o estoque
+                    product.setEstoquePeso((updatedProductDTO.getEstoquePeso()));
+                    product.setStockAlertLimit(updatedProductDTO.getStockAlertLimit());
 
                     if (updatedProductDTO.getCategoryId() != null) {
                         Optional<Category> category = categoryRepository.findById(updatedProductDTO.getCategoryId());
@@ -72,6 +78,8 @@ public class ProductService {
         productDTO.setCodeBar(product.getCodeBar());
         productDTO.setBulk(product.isBulk());
         productDTO.setImageUrl(product.getImageUrl());
+        productDTO.setEstoquePeso(product.getEstoquePeso());
+        productDTO.setStockAlertLimit(product.getStockAlertLimit());
 
         if (product.getCategory() != null) {
             productDTO.setCategoryId(product.getCategory().getId());

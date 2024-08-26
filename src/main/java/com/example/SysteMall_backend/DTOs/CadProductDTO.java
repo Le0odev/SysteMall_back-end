@@ -18,6 +18,10 @@ public class CadProductDTO {
     private String codeBar;
     private boolean bulk;
     private String imageUrl;
+    private BigDecimal estoquePeso;
+    private BigDecimal stockAlertLimit;
+
+
 
     public void setCategoryName(String categoryName) {
     }

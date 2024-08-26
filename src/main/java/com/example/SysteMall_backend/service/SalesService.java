@@ -29,6 +29,7 @@ public class SalesService {
         this.productRepository = productRepository;
     }
 
+
     public SalesDTO createSale(CreateSaleRequest request) {
         BigDecimal total = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 
@@ -45,11 +46,23 @@ public class SalesService {
                 // Corrigindo o cálculo para produtos a granel (considerando o peso em gramas e preço por kg)
                 BigDecimal weightInKg = itemDTO.getWeight().divide(BigDecimal.valueOf(1000), 2, BigDecimal.ROUND_HALF_UP);
                 subtotal = product.getProductPrice().multiply(weightInKg).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                // Atualiza o estoque para produtos a granel
+                if (product.getEstoquePeso().compareTo(weightInKg) < 0) {
+                    throw new RuntimeException("Estoque insuficiente para o produto a granel");
+                }
+                product.setEstoquePeso(product.getEstoquePeso().subtract(weightInKg).setScale(2, BigDecimal.ROUND_HALF_UP));
             } else {
                 if (itemDTO.getQuantity() == null || itemDTO.getQuantity() <= 0) {
                     throw new RuntimeException("A quantidade do produto não está especificada ou é inválida");
                 }
                 subtotal = product.getProductPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                // Atualiza o estoque para produtos em unidades
+                if (product.getProductQuantity() < itemDTO.getQuantity()) {
+                    throw new RuntimeException("Estoque insuficiente para o produto");
+                }
+                product.setProductQuantity(product.getProductQuantity() - itemDTO.getQuantity());
             }
 
             total = total.add(subtotal).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -83,9 +96,14 @@ public class SalesService {
         // Salva a venda no banco de dados
         Sales savedSale = salesRepository.save(sale);
 
+        // Atualiza o produto no banco de dados
+        productRepository.saveAll(saleItems.stream().map(SaleItem::getProduct).collect(Collectors.toList()));
+
         // Mapeia a venda para DTO e retorna
         return mapToDTO(savedSale);
     }
+
+
 
 
     public List<SalesDTO> getAllSales() {

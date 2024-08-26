@@ -35,11 +35,18 @@ public class Product {
     @Column(name = "estoque_quant")
     private Integer productQuantity;
 
+    @Column(name = "estoque_peso")
+    private BigDecimal estoquePeso;
+
+    @Column(name = "alerta_estoque")
+    private BigDecimal stockAlertLimit;
+
     @Column(name = "image_url")
 
     private String imageUrl;
 
     private boolean isBulk;
+
 
     @ManyToOne
     @JoinColumn(name = "category_id")
