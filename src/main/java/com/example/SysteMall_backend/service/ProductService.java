@@ -8,6 +8,7 @@ import com.example.SysteMall_backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class ProductService {
         product.setBulk(productDTO.isBulk());
         product.setImageUrl(productDTO.getImageUrl());
         product.setProductQuantity(productDTO.getProductQuantity());
-        product.setEstoquePeso((productDTO.getEstoquePeso()));
+        product.setEstoquePeso(productDTO.getEstoquePeso());
         product.setStockAlertLimit(productDTO.getStockAlertLimit());
 
         if (productDTO.getCategoryId() != null) {
@@ -55,7 +56,7 @@ public class ProductService {
                     product.setBulk(updatedProductDTO.isBulk()); // Atualizando o campo isBulk
                     product.setImageUrl(updatedProductDTO.getImageUrl());
                     product.setProductQuantity(updatedProductDTO.getProductQuantity()); // Atualizando o estoque
-                    product.setEstoquePeso((updatedProductDTO.getEstoquePeso()));
+                    product.setEstoquePeso(updatedProductDTO.getEstoquePeso());
                     product.setStockAlertLimit(updatedProductDTO.getStockAlertLimit());
 
                     if (updatedProductDTO.getCategoryId() != null) {
@@ -76,6 +77,7 @@ public class ProductService {
         productDTO.setProductDescription(product.getProductDescription());
         productDTO.setProductPrice(product.getProductPrice());
         productDTO.setCodeBar(product.getCodeBar());
+        productDTO.setProductQuantity(product.getProductQuantity());
         productDTO.setBulk(product.isBulk());
         productDTO.setImageUrl(product.getImageUrl());
         productDTO.setEstoquePeso(product.getEstoquePeso());
