@@ -2,6 +2,7 @@ package com.example.SysteMall_backend.service;
 
 import com.example.SysteMall_backend.DTOs.CategoryDTO;
 import com.example.SysteMall_backend.entity.Category;
+import com.example.SysteMall_backend.exception.CustomException;
 import com.example.SysteMall_backend.repository.CategoryRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ public class CategoryService {
                     category.setCategoryDescription(updatedCategoryDTO.getCategoryDescription());
                     return mapToDTO(categoryRepository.save(category));
                 })
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new CustomException("Categoria não encontrada"));
     }
 
     public void deleteCategory(Long id) {

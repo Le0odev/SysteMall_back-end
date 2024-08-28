@@ -6,15 +6,19 @@ import com.example.SysteMall_backend.DTOs.SalesDTO;
 import com.example.SysteMall_backend.entity.Product;
 import com.example.SysteMall_backend.entity.SaleItem;
 import com.example.SysteMall_backend.entity.Sales;
+import com.example.SysteMall_backend.exception.CustomException;
 import com.example.SysteMall_backend.repository.ProductRepository;
 import com.example.SysteMall_backend.repository.SalesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,12 +40,12 @@ public class SalesService {
         List<SaleItem> saleItems = new ArrayList<>();
         for (SaleItemDTO itemDTO : request.getItemsSale()) {
             Product product = productRepository.findById(itemDTO.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                    .orElseThrow(() -> new CustomException("Produto não encontrado"));
 
             BigDecimal subtotal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
             if (Boolean.TRUE.equals(itemDTO.getIsBulk())) {
                 if (itemDTO.getWeight() == null || itemDTO.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new RuntimeException("O peso do produto a granel não está especificado ou é inválido");
+                    throw new CustomException("O peso do produto a granel não está especificado ou é inválido");
                 }
                 // Corrigindo o cálculo para produtos a granel (considerando o peso em gramas e preço por kg)
                 BigDecimal weightInKg = itemDTO.getWeight().divide(BigDecimal.valueOf(1000), 2, BigDecimal.ROUND_HALF_UP);
@@ -49,18 +53,18 @@ public class SalesService {
 
                 // Atualiza o estoque para produtos a granel
                 if (product.getEstoquePeso().compareTo(weightInKg) < 0) {
-                    throw new RuntimeException("Estoque insuficiente para o produto a granel");
+                    throw new CustomException("Estoque insuficiente para o produto a granel");
                 }
                 product.setEstoquePeso(product.getEstoquePeso().subtract(weightInKg).setScale(2, BigDecimal.ROUND_HALF_UP));
             } else {
                 if (itemDTO.getQuantity() == null || itemDTO.getQuantity() <= 0) {
-                    throw new RuntimeException("A quantidade do produto não está especificada ou é inválida");
+                    throw new CustomException("A quantidade do produto não está especificada ou é inválida");
                 }
                 subtotal = product.getProductPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_UP);
 
                 // Atualiza o estoque para produtos em unidades
                 if (product.getProductQuantity() < itemDTO.getQuantity()) {
-                    throw new RuntimeException("Estoque insuficiente para o produto");
+                    throw new CustomException("Estoque insuficiente para o produto");
                 }
                 product.setProductQuantity(product.getProductQuantity() - itemDTO.getQuantity());
             }
@@ -104,6 +108,10 @@ public class SalesService {
     }
 
 
+    public Long getLastSaleId() {
+        Optional<Sales> lastSale = salesRepository.findTopByOrderByIdDesc();
+        return lastSale.map(Sales::getId).orElse(null);
+    }
 
 
     public List<SalesDTO> getAllSales() {

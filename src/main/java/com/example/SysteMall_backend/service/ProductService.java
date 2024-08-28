@@ -3,6 +3,7 @@ package com.example.SysteMall_backend.service;
 import com.example.SysteMall_backend.DTOs.CadProductDTO;
 import com.example.SysteMall_backend.entity.Category;
 import com.example.SysteMall_backend.entity.Product;
+import com.example.SysteMall_backend.exception.CustomException;
 import com.example.SysteMall_backend.repository.CategoryRepository;
 import com.example.SysteMall_backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ public class ProductService {
 
                     return mapToDTO(productRepository.save(product));
                 })
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new CustomException("Produto não encontrado"));
     }
 
 

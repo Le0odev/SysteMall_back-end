@@ -43,6 +43,12 @@ public class SaleController {
         return new ResponseEntity<>(allSales, HttpStatus.OK);
     }
 
+    @GetMapping("/last-id")
+    public ResponseEntity<Long> getLastSaleId() {
+        Long lastSaleId = salesService.getLastSaleId();
+        return new ResponseEntity<>(lastSaleId, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<SalesDTO> getSaleById(@PathVariable Long id) {
         SalesDTO salesDTO = salesService.getSalesById(id);
