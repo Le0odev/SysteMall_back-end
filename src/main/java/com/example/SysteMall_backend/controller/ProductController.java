@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "http://localhost:5173") // Adicione o domínio do frontend
+@CrossOrigin(origins = {"http://localhost:5173", "http://10.0.0.108:5173"})
 public class ProductController {
 
     private final ProductService productService;

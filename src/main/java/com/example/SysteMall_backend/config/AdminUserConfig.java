@@ -44,7 +44,7 @@ public class AdminUserConfig implements CommandLineRunner {
         }
 
         // Verifica se o usuário admin já existe no banco de dados
-        var userAdminOptional = userRepository.findByUsername("admin");
+        var userAdminOptional = userRepository.findByUsername("admin2");
 
         Optional<Role> finalRoleAdminOptional = roleAdminOptional;
         userAdminOptional.ifPresentOrElse(
@@ -54,7 +54,7 @@ public class AdminUserConfig implements CommandLineRunner {
                 () -> {
                     // Se o usuário admin não existir, cria-o
                     var user = new User();
-                    user.setUsername("admin");
+                    user.setUsername("admin2");
                     user.setPassword(passwordEncoder.encode("password"));
                     // Obtém o papel de administrador do Optional
                     Role roleAdmin = finalRoleAdminOptional.get();
