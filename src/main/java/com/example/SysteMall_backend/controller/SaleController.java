@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/sales")
-@CrossOrigin(origins = {"http://localhost:5173", "http://10.0.0.108:5173"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://10.0.0.108:5173", "http://10.0.0.108:5173"})
 public class SaleController {
 
     private final SalesService salesService;
