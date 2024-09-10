@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://10.0.0.108:5173", "http://10.0.0.108:5173"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://10.0.0.107:5173", "http://10.0.0.108:5173"})
 public class TokenController {
 
     private JwtEncoder jwtEncoder;
