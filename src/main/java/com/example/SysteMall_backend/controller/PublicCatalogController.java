@@ -51,6 +51,11 @@ public class PublicCatalogController {
         return categoryService.searchCategory(categoryName, id);
     }
 
+    @GetMapping("/products/all")
+    public ResponseEntity<List<CadProductDTO>> AllProducts() {
+        List<CadProductDTO> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
 
 
 }
