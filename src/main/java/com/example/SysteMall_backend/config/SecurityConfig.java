@@ -51,6 +51,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/public/catalog/search").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/public/catalog/categories").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/public/categories/search").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/public/products/all").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
