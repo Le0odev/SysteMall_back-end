@@ -52,7 +52,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/public/catalog/categories").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/public/categories/search").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/public/products/all").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/feedback").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/feedback").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
