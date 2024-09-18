@@ -16,9 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -179,4 +177,25 @@ public class SalesService {
         BigDecimal discountAmount = total.multiply(salesDTO.getDiscount()).divide(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
         return total.subtract(discountAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
+
+    public Map<Long, BigDecimal> getTotalSalesByCategory(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Sales> sales = salesRepository.findBySaleDateBetween(startDate, endDate);
+
+        Map<Long, BigDecimal> salesByCategory = new HashMap<>();
+
+        for (Sales sale : sales) {
+            for (SaleItem saleItem : sale.getSaleItems()) {
+                Product product = saleItem.getProduct();
+                Long categoryId = product.getCategory().getId();
+                BigDecimal subtotal = saleItem.getSubtotal();
+
+                salesByCategory.merge(categoryId, subtotal, BigDecimal::add);
+            }
+        }
+
+        return salesByCategory;
+    }
+
+
+
 }

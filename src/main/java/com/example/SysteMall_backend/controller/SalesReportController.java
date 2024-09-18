@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/report")
@@ -62,6 +64,13 @@ public class SalesReportController {
         return new ResponseEntity<>(sales, HttpStatus.OK);
     }
 
+    @GetMapping("/sales-categories")
+    public ResponseEntity<Map<Long, BigDecimal>> getSalesByCategories(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+        Map<Long, BigDecimal> salesByCategory = salesReportService.getTotalSalesByCategory(startDate, endDate);
+        return new ResponseEntity<>(salesByCategory, HttpStatus.OK);
+    }
 
 
 }

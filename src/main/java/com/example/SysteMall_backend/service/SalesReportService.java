@@ -1,5 +1,7 @@
 package com.example.SysteMall_backend.service;
 
+import com.example.SysteMall_backend.entity.Product;
+import com.example.SysteMall_backend.entity.SaleItem;
 import com.example.SysteMall_backend.entity.Sales;
 import com.example.SysteMall_backend.repository.SalesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SalesReportService {
@@ -56,4 +60,23 @@ public class SalesReportService {
     public List<Sales> getAllSales() {
         return salesRepository.findAll();
     }
+
+    public Map<Long, BigDecimal> getTotalSalesByCategory(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Sales> sales = salesRepository.findBySaleDateBetween(startDate, endDate);
+
+        Map<Long, BigDecimal> salesByCategory = new HashMap<>();
+
+        for (Sales sale : sales) {
+            for (SaleItem saleItem : sale.getSaleItems()) {
+                Product product = saleItem.getProduct();
+                Long categoryId = product.getCategory().getId();
+                BigDecimal subtotal = saleItem.getSubtotal();
+
+                salesByCategory.merge(categoryId, subtotal, BigDecimal::add);
+            }
+        }
+
+        return salesByCategory;
+    }
+
 }

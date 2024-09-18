@@ -44,6 +44,11 @@ public class CategoryService {
                 .map(this::mapToDTO);
     }
 
+    public List<CategoryDTO> getAllCategoriess() {
+        return categoryRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
     public Optional<CategoryDTO> getCategoryById(Long id) {
         return categoryRepository.findById(id)
@@ -81,4 +86,6 @@ public class CategoryService {
         categoryDTO.setCategoryDescription(category.getCategoryDescription());
         return categoryDTO;
     }
+
 }
+
