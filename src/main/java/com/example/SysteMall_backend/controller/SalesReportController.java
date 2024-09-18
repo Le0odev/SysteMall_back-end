@@ -72,5 +72,13 @@ public class SalesReportController {
         return new ResponseEntity<>(salesByCategory, HttpStatus.OK);
     }
 
+    @GetMapping("/sales-products")
+    public ResponseEntity<Map<Long, BigDecimal>> getSalesByProducts(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+        Map<Long, BigDecimal> salesByProduct = salesReportService.getTotalSalesByProduct(startDate, endDate);
+        return new ResponseEntity<>(salesByProduct, HttpStatus.OK);
+    }
+
 
 }

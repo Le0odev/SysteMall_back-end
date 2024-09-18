@@ -196,6 +196,25 @@ public class SalesService {
         return salesByCategory;
     }
 
+    public Map<Long, BigDecimal> getTotalSalesByProduct(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Sales> sales = salesRepository.findBySaleDateBetween(startDate, endDate);
+
+        Map<Long, BigDecimal> salesByProduct = new HashMap<>();
+
+        for (Sales sale : sales) {
+            for (SaleItem saleItem : sale.getSaleItems()) {
+                Product product = saleItem.getProduct();
+                Long productId = product.getId();
+                BigDecimal subtotal = saleItem.getSubtotal();
+
+                salesByProduct.merge(productId, subtotal, BigDecimal::add);
+            }
+        }
+
+        return salesByProduct;
+    }
+
+
 
 
 }
