@@ -40,22 +40,21 @@ public class ProductService {
         product.setEstoquePeso(productDTO.getEstoquePeso());
         product.setStockAlertLimit(productDTO.getStockAlertLimit());
 
+        if (productDTO.getCategoryId() != null) {
+            Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
+            category.ifPresent(product::setCategory);
+        }
         // Configurar variações de sabor
         List<FlavorVariation> flavorVariations = productDTO.getFlavorVariations().stream()
                 .map(flavorDTO -> {
                     FlavorVariation flavor = new FlavorVariation();
                     flavor.setFlavor(flavorDTO.getFlavor());
                     flavor.setCodeBar(flavorDTO.getCodeBar());
-                    flavor.setProduct(product);
+                    flavor.setProduct(product); // Associa a variação ao produto
                     return flavor;
                 }).collect(Collectors.toList());
 
         product.setFlavorVariations(flavorVariations);
-
-        if (productDTO.getCategoryId() != null) {
-            Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
-            category.ifPresent(product::setCategory);
-        }
 
         Product savedProduct = productRepository.save(product);
         return mapToDTO(savedProduct);
@@ -68,9 +67,9 @@ public class ProductService {
                     product.setProductDescription(updatedProductDTO.getProductDescription());
                     product.setProductPrice(updatedProductDTO.getProductPrice());
                     product.setCodeBar(updatedProductDTO.getCodeBar());
-                    product.setBulk(updatedProductDTO.isBulk()); // Atualizando o campo isBulk
+                    product.setBulk(updatedProductDTO.isBulk());
                     product.setImageUrl(updatedProductDTO.getImageUrl());
-                    product.setProductQuantity(updatedProductDTO.getProductQuantity()); // Atualizando o estoque
+                    product.setProductQuantity(updatedProductDTO.getProductQuantity());
                     product.setEstoquePeso(updatedProductDTO.getEstoquePeso());
                     product.setStockAlertLimit(updatedProductDTO.getStockAlertLimit());
 
@@ -79,10 +78,43 @@ public class ProductService {
                         category.ifPresent(product::setCategory);
                     }
 
+                    // Atualizar variações de sabor
+                    List<FlavorVariation> currentVariations = product.getFlavorVariations();
+                    List<FlavorVariationDTO> updatedVariationsDTO = updatedProductDTO.getFlavorVariations();
+
+                    // Remover variações que não estão mais presentes
+                    currentVariations.removeIf(variation ->
+                            updatedVariationsDTO.stream().noneMatch(dto ->
+                                    dto.getFlavor().equals(variation.getFlavor()) &&
+                                            dto.getCodeBar().equals(variation.getCodeBar())));
+
+                    // Adicionar ou atualizar variações
+                    updatedVariationsDTO.forEach(dto -> {
+                        Optional<FlavorVariation> existingVariation = currentVariations.stream()
+                                .filter(variation -> variation.getFlavor().equals(dto.getFlavor()))
+                                .findFirst();
+
+                        if (existingVariation.isPresent()) {
+                            // Atualizar variação existente
+                            FlavorVariation variation = existingVariation.get();
+                            variation.setCodeBar(dto.getCodeBar());
+                        } else {
+                            // Adicionar nova variação
+                            FlavorVariation newVariation = new FlavorVariation();
+                            newVariation.setFlavor(dto.getFlavor());
+                            newVariation.setCodeBar(dto.getCodeBar());
+                            newVariation.setProduct(product);
+                            currentVariations.add(newVariation);
+                        }
+                    });
+
+                    product.setFlavorVariations(currentVariations);
+
                     return mapToDTO(productRepository.save(product));
                 })
                 .orElseThrow(() -> new CustomException("Produto não encontrado"));
     }
+
 
 
     private CadProductDTO mapToDTO(Product product) {
