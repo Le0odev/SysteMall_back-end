@@ -12,8 +12,8 @@ import com.example.SysteMall_backend.repository.VariationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +35,7 @@ public class ProductService {
         product.setProductName(productDTO.getProductName());
         product.setProductDescription(productDTO.getProductDescription());
         product.setProductPrice(productDTO.getProductPrice());
+        product.setCodeBar(productDTO.getCodeBar());
         product.setBulk(productDTO.isBulk());
         product.setImageUrl(productDTO.getImageUrl());
         product.setProductQuantity(productDTO.getProductQuantity());
@@ -46,17 +47,17 @@ public class ProductService {
             category.ifPresent(product::setCategory);
         }
 
-        // Salvar produto
         Product savedProduct = productRepository.save(product);
 
-        // Salvar variações (sabores, código de barras, etc.)
-        if (productDTO.getVariations() != null) {
-            for (var variationDTO : productDTO.getVariations()) {
+        // Salvar variações (se houver)
+        if (productDTO.getVariations() != null && !productDTO.getVariations().isEmpty()) {
+            for (VariationDTO variationDTO : productDTO.getVariations()) {
                 ProductVariation variation = new ProductVariation();
                 variation.setProduct(savedProduct);
                 variation.setFlavor(variationDTO.getFlavor());
                 variation.setCodeBar(variationDTO.getCodeBar());
-
+                variation.setProductQuantity(variationDTO.getProductQuantity());
+                variation.setEstoquePeso(variationDTO.getEstoquePeso());
                 variationRepository.save(variation);
             }
         }
@@ -70,9 +71,10 @@ public class ProductService {
                     product.setProductName(updatedProductDTO.getProductName());
                     product.setProductDescription(updatedProductDTO.getProductDescription());
                     product.setProductPrice(updatedProductDTO.getProductPrice());
+                    product.setCodeBar(updatedProductDTO.getCodeBar());
                     product.setBulk(updatedProductDTO.isBulk());
                     product.setImageUrl(updatedProductDTO.getImageUrl());
-                    product.setProductQuantity(updatedProductDTO.getProductQuantity()); // Atualizando o estoque
+                    product.setProductQuantity(updatedProductDTO.getProductQuantity());
                     product.setEstoquePeso(updatedProductDTO.getEstoquePeso());
                     product.setStockAlertLimit(updatedProductDTO.getStockAlertLimit());
 
@@ -81,23 +83,18 @@ public class ProductService {
                         category.ifPresent(product::setCategory);
                     }
 
-                    // Atualizar produto
                     Product savedProduct = productRepository.save(product);
 
-                    // Atualizar variações (sabores, código de barras, etc.)
+                    // Atualizar variações
                     if (updatedProductDTO.getVariations() != null) {
-                        // Primeiro, remover as variações antigas (orphanRemoval = true)
                         variationRepository.deleteByProductId(product.getId());
-
-                        // Agora, adicionar as novas variações
-                        for (var variationDTO : updatedProductDTO.getVariations()) {
+                        for (VariationDTO variationDTO : updatedProductDTO.getVariations()) {
                             ProductVariation variation = new ProductVariation();
                             variation.setProduct(savedProduct);
                             variation.setFlavor(variationDTO.getFlavor());
                             variation.setCodeBar(variationDTO.getCodeBar());
                             variation.setProductQuantity(variationDTO.getProductQuantity());
                             variation.setEstoquePeso(variationDTO.getEstoquePeso());
-
                             variationRepository.save(variation);
                         }
                     }
@@ -107,15 +104,13 @@ public class ProductService {
                 .orElseThrow(() -> new CustomException("Produto não encontrado"));
     }
 
-
-
-
     private CadProductDTO mapToDTO(Product product) {
         CadProductDTO productDTO = new CadProductDTO();
         productDTO.setId(product.getId());
         productDTO.setProductName(product.getProductName());
         productDTO.setProductDescription(product.getProductDescription());
         productDTO.setProductPrice(product.getProductPrice());
+        productDTO.setCodeBar(product.getCodeBar());
         productDTO.setBulk(product.isBulk());
         productDTO.setImageUrl(product.getImageUrl());
         productDTO.setProductQuantity(product.getProductQuantity());
@@ -126,7 +121,7 @@ public class ProductService {
             productDTO.setCategoryId(product.getCategory().getId());
         }
 
-        // Mapear as variações para o DTO
+        // Mapear variações
         List<VariationDTO> variationDTOs = product.getVariations().stream().map(variation -> {
             VariationDTO variationDTO = new VariationDTO();
             variationDTO.setId(variation.getId());
@@ -141,6 +136,9 @@ public class ProductService {
 
         return productDTO;
     }
+
+    // Os métodos getAllProducts, getProductById, searchProducts, searchByCodeBar, deleteProduct, e deleteAllProduct permanecem inalterados
+
     public List<CadProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -160,11 +158,10 @@ public class ProductService {
     }
 
     public List<Product> searchByCodeBar(String codeBar, Long categoryId) {
-
         if (categoryId != null && categoryId != 0) {
             return productRepository.findByCodeBarAndCategoryId(codeBar, categoryId);
         }
-         return productRepository.findByCodeBar(codeBar);
+        return productRepository.findByCodeBar(codeBar);
     }
 
     public void deleteProduct(Long id) {
@@ -174,11 +171,4 @@ public class ProductService {
     public void deleteAllProduct() {
         productRepository.deleteAll();
     }
-
-
-
-
-
-
-
 }
