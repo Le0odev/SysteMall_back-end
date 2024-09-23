@@ -37,6 +37,9 @@ public class ProductService {
         product.setProductPrice(productDTO.getProductPrice());
         product.setBulk(productDTO.isBulk());
         product.setImageUrl(productDTO.getImageUrl());
+        product.setProductQuantity(productDTO.getProductQuantity());
+        product.setEstoquePeso(productDTO.getEstoquePeso());
+        product.setStockAlertLimit(productDTO.getStockAlertLimit());
 
         if (productDTO.getCategoryId() != null) {
             Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
@@ -53,8 +56,6 @@ public class ProductService {
                 variation.setProduct(savedProduct);
                 variation.setFlavor(variationDTO.getFlavor());
                 variation.setCodeBar(variationDTO.getCodeBar());
-                variation.setProductQuantity(variationDTO.getProductQuantity());
-                variation.setEstoquePeso(variationDTO.getEstoquePeso());
 
                 variationRepository.save(variation);
             }
@@ -71,6 +72,9 @@ public class ProductService {
                     product.setProductPrice(updatedProductDTO.getProductPrice());
                     product.setBulk(updatedProductDTO.isBulk());
                     product.setImageUrl(updatedProductDTO.getImageUrl());
+                    product.setProductQuantity(updatedProductDTO.getProductQuantity()); // Atualizando o estoque
+                    product.setEstoquePeso(updatedProductDTO.getEstoquePeso());
+                    product.setStockAlertLimit(updatedProductDTO.getStockAlertLimit());
 
                     if (updatedProductDTO.getCategoryId() != null) {
                         Optional<Category> category = categoryRepository.findById(updatedProductDTO.getCategoryId());
@@ -114,6 +118,9 @@ public class ProductService {
         productDTO.setProductPrice(product.getProductPrice());
         productDTO.setBulk(product.isBulk());
         productDTO.setImageUrl(product.getImageUrl());
+        productDTO.setProductQuantity(product.getProductQuantity());
+        productDTO.setEstoquePeso(product.getEstoquePeso());
+        productDTO.setStockAlertLimit(product.getStockAlertLimit());
 
         if (product.getCategory() != null) {
             productDTO.setCategoryId(product.getCategory().getId());
