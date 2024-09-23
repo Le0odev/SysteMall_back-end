@@ -1,9 +1,7 @@
 package com.example.SysteMall_backend.service;
 
 import com.example.SysteMall_backend.DTOs.CadProductDTO;
-import com.example.SysteMall_backend.DTOs.FlavorVariationDTO;
 import com.example.SysteMall_backend.entity.Category;
-import com.example.SysteMall_backend.entity.FlavorVariation;
 import com.example.SysteMall_backend.entity.Product;
 import com.example.SysteMall_backend.exception.CustomException;
 import com.example.SysteMall_backend.repository.CategoryRepository;
@@ -44,17 +42,6 @@ public class ProductService {
             Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
             category.ifPresent(product::setCategory);
         }
-        // Configurar variações de sabor
-        List<FlavorVariation> flavorVariations = productDTO.getFlavorVariations().stream()
-                .map(flavorDTO -> {
-                    FlavorVariation flavor = new FlavorVariation();
-                    flavor.setFlavor(flavorDTO.getFlavor());
-                    flavor.setCodeBar(flavorDTO.getCodeBar());
-                    flavor.setProduct(product); // Associa a variação ao produto
-                    return flavor;
-                }).collect(Collectors.toList());
-
-        product.setFlavorVariations(flavorVariations);
 
         Product savedProduct = productRepository.save(product);
         return mapToDTO(savedProduct);
@@ -67,9 +54,9 @@ public class ProductService {
                     product.setProductDescription(updatedProductDTO.getProductDescription());
                     product.setProductPrice(updatedProductDTO.getProductPrice());
                     product.setCodeBar(updatedProductDTO.getCodeBar());
-                    product.setBulk(updatedProductDTO.isBulk());
+                    product.setBulk(updatedProductDTO.isBulk()); // Atualizando o campo isBulk
                     product.setImageUrl(updatedProductDTO.getImageUrl());
-                    product.setProductQuantity(updatedProductDTO.getProductQuantity());
+                    product.setProductQuantity(updatedProductDTO.getProductQuantity()); // Atualizando o estoque
                     product.setEstoquePeso(updatedProductDTO.getEstoquePeso());
                     product.setStockAlertLimit(updatedProductDTO.getStockAlertLimit());
 
@@ -78,43 +65,10 @@ public class ProductService {
                         category.ifPresent(product::setCategory);
                     }
 
-                    // Atualizar variações de sabor
-                    List<FlavorVariation> currentVariations = product.getFlavorVariations();
-                    List<FlavorVariationDTO> updatedVariationsDTO = updatedProductDTO.getFlavorVariations();
-
-                    // Remover variações que não estão mais presentes
-                    currentVariations.removeIf(variation ->
-                            updatedVariationsDTO.stream().noneMatch(dto ->
-                                    dto.getFlavor().equals(variation.getFlavor()) &&
-                                            dto.getCodeBar().equals(variation.getCodeBar())));
-
-                    // Adicionar ou atualizar variações
-                    updatedVariationsDTO.forEach(dto -> {
-                        Optional<FlavorVariation> existingVariation = currentVariations.stream()
-                                .filter(variation -> variation.getFlavor().equals(dto.getFlavor()))
-                                .findFirst();
-
-                        if (existingVariation.isPresent()) {
-                            // Atualizar variação existente
-                            FlavorVariation variation = existingVariation.get();
-                            variation.setCodeBar(dto.getCodeBar());
-                        } else {
-                            // Adicionar nova variação
-                            FlavorVariation newVariation = new FlavorVariation();
-                            newVariation.setFlavor(dto.getFlavor());
-                            newVariation.setCodeBar(dto.getCodeBar());
-                            newVariation.setProduct(product);
-                            currentVariations.add(newVariation);
-                        }
-                    });
-
-                    product.setFlavorVariations(currentVariations);
-
                     return mapToDTO(productRepository.save(product));
                 })
                 .orElseThrow(() -> new CustomException("Produto não encontrado"));
     }
-
 
 
     private CadProductDTO mapToDTO(Product product) {
@@ -129,17 +83,6 @@ public class ProductService {
         productDTO.setImageUrl(product.getImageUrl());
         productDTO.setEstoquePeso(product.getEstoquePeso());
         productDTO.setStockAlertLimit(product.getStockAlertLimit());
-
-        // Mapear variações de sabor
-        List<FlavorVariationDTO> flavorVariationDTOs = product.getFlavorVariations().stream()
-                .map(flavor -> {
-                    FlavorVariationDTO flavorDTO = new FlavorVariationDTO();
-                    flavorDTO.setFlavor(flavor.getFlavor());
-                    flavorDTO.setCodeBar(flavor.getCodeBar());
-                    return flavorDTO;
-                }).collect(Collectors.toList());
-
-        productDTO.setFlavorVariations(flavorVariationDTOs);
 
         if (product.getCategory() != null) {
             productDTO.setCategoryId(product.getCategory().getId());
