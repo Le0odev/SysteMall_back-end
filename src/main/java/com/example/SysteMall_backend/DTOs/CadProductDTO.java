@@ -22,8 +22,6 @@ public class CadProductDTO {
     private BigDecimal estoquePeso;
     private BigDecimal stockAlertLimit;
 
-    private List<FlavorVariationDTO> flavorVariations;
-
 
 
     public void setCategoryName(String categoryName) {
