@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +21,8 @@ public class CadProductDTO {
     private String imageUrl;
     private BigDecimal estoquePeso;
     private BigDecimal stockAlertLimit;
+
+    private List<VariationDTO> variations;
 
 
 

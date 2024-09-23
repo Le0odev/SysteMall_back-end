@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -47,6 +48,8 @@ public class Product {
 
     private boolean isBulk;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariation> variations = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "category_id")

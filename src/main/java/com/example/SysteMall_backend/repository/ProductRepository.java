@@ -1,5 +1,6 @@
 package com.example.SysteMall_backend.repository;
 
+import com.example.SysteMall_backend.entity.Category;
 import com.example.SysteMall_backend.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         List<Product> findByCodeBar(String codeBar);
         List<Product> findByCodeBarAndCategoryId(String codeBar, Long categoryId);
 
+        List<Product> findByCategory(Category category);
 
 
 }
