@@ -22,7 +22,7 @@ public class CadProductDTO {
     private BigDecimal estoquePeso;
     private BigDecimal stockAlertLimit;
 
-    private List<VariationDTO> variations;
+    private List<FlavorVariationDTO> flavorVariations;
 
 
 
