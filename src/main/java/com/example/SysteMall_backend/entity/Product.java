@@ -48,7 +48,6 @@ public class Product {
 
     private boolean isBulk;
 
-
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonIgnore
