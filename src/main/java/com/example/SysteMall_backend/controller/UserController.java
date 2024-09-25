@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://10.0.0.107:5173", "http://10.0.0.108:5173"})
+@CrossOrigin(origins = "https://emporioverdegraos.vercel.app")
 public class UserController {
 
     private UserRepository userRepository;

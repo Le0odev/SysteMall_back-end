@@ -54,8 +54,8 @@ public class AdminUserConfig implements CommandLineRunner {
                 () -> {
                     // Se o usuário admin não existir, cria-o
                     var user = new User();
-                    user.setUsername("admin2");
-                    user.setPassword(passwordEncoder.encode("password"));
+                    user.setUsername("Cristiane");
+                    user.setPassword(passwordEncoder.encode("cris0808"));
                     // Obtém o papel de administrador do Optional
                     Role roleAdmin = finalRoleAdminOptional.get();
                     // Adiciona o papel de administrador ao usuário

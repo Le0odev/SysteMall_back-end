@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173", "http://10.0.0.108:5173", "http://10.0.0.107:5173") // Adicione o protocolo corretamente
+                        .allowedOrigins("https://emporioverdegraos.vercel.app") // Adicione o protocolo corretamente
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

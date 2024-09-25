@@ -53,6 +53,9 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/public/categories/search").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/public/products/all").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/feedback").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/AIOpen/pergunta").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/products/sugerir").permitAll()
+
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
