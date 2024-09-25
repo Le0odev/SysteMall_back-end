@@ -21,6 +21,7 @@ public class CadProductDTO {
     private String imageUrl;
     private BigDecimal estoquePeso;
     private BigDecimal stockAlertLimit;
+    private List<String> flavors;
 
 
 

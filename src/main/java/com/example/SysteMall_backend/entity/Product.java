@@ -48,6 +48,10 @@ public class Product {
 
     private boolean isBulk;
 
+    @ElementCollection
+    private List<String> flavors; // Sabores como lista de strings
+
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonIgnore

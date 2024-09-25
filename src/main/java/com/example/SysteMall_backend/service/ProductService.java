@@ -37,6 +37,9 @@ public class ProductService {
         product.setProductQuantity(productDTO.getProductQuantity());
         product.setEstoquePeso(productDTO.getEstoquePeso());
         product.setStockAlertLimit(productDTO.getStockAlertLimit());
+        product.setFlavors(productDTO.getFlavors());
+
+
 
         if (productDTO.getCategoryId() != null) {
             Optional<Category> category = categoryRepository.findById(productDTO.getCategoryId());
@@ -59,6 +62,8 @@ public class ProductService {
                     product.setProductQuantity(updatedProductDTO.getProductQuantity()); // Atualizando o estoque
                     product.setEstoquePeso(updatedProductDTO.getEstoquePeso());
                     product.setStockAlertLimit(updatedProductDTO.getStockAlertLimit());
+                    product.setFlavors(updatedProductDTO.getFlavors());
+
 
                     if (updatedProductDTO.getCategoryId() != null) {
                         Optional<Category> category = categoryRepository.findById(updatedProductDTO.getCategoryId());
@@ -83,6 +88,8 @@ public class ProductService {
         productDTO.setImageUrl(product.getImageUrl());
         productDTO.setEstoquePeso(product.getEstoquePeso());
         productDTO.setStockAlertLimit(product.getStockAlertLimit());
+        productDTO.setFlavors(product.getFlavors());
+
 
         if (product.getCategory() != null) {
             productDTO.setCategoryId(product.getCategory().getId());
