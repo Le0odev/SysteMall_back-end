@@ -34,7 +34,7 @@ public class SalesService {
 
     public SalesDTO createSale(CreateSaleRequest request) {
         BigDecimal total = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-
+        
         List<SaleItem> saleItems = new ArrayList<>();
         for (SaleItemDTO itemDTO : request.getItemsSale()) {
             Product product = productRepository.findById(itemDTO.getProductId())
@@ -84,10 +84,11 @@ public class SalesService {
             BigDecimal discountAmount = total.multiply(discount).divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_UP);
             total = total.subtract(discountAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
         }
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
         // Cria a venda
         Sales sale = new Sales();
-        sale.setSaleDate(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        sale.setSaleDate(zonedDateTime.toLocalDateTime());
         sale.setSaleItems(saleItems);
         sale.setSaleTotals(total);
         sale.setDiscount(discount);
