@@ -87,7 +87,7 @@ public class SalesService {
 
         // Cria a venda
         Sales sale = new Sales();
-        sale.setSaleDate(LocalDateTime.now());
+        sale.setSaleDate(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         sale.setSaleItems(saleItems);
         sale.setSaleTotals(total);
         sale.setDiscount(discount);
