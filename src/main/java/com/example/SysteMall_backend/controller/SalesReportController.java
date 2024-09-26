@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/report")
-@CrossOrigin(origins = "https://emporioverdegraos.vercel.app")
+@CrossOrigin(origins = {"https://emporioverdegraos.vercel.app", "http://localhost:5173"})
 public class SalesReportController {
 
     private final SalesReportService salesReportService;
