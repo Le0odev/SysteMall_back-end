@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 
 @Service
 public class SalesReportService {
@@ -30,10 +33,10 @@ public class SalesReportService {
 
 
     public List<Sales> getSalesByDay(LocalDate day) {
-        LocalDateTime startOfDay = day.atStartOfDay();
-        LocalDateTime endOfDay = day.atTime(23, 59, 59);
-        return salesRepository.findBySaleDateBetween(startOfDay, endOfDay);
-    }
+    ZonedDateTime startOfDay = day.atStartOfDay(ZoneId.of("America/Sao_Paulo"));
+    ZonedDateTime endOfDay = day.atTime(23, 59, 59).atZone(ZoneId.of("America/Sao_Paulo"));
+    return salesRepository.findBySaleDateBetween(startOfDay.toLocalDateTime(), endOfDay.toLocalDateTime());
+}
 
     public BigDecimal getTotalSalesByDay(LocalDate day) {
         List<Sales> sales = getSalesByDay(day);
