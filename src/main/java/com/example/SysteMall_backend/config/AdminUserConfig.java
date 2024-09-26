@@ -44,7 +44,7 @@ public class AdminUserConfig implements CommandLineRunner {
         }
 
         // Verifica se o usuário admin já existe no banco de dados
-        var userAdminOptional = userRepository.findByUsername("admin2");
+        var userAdminOptional = userRepository.findByUsername("Cristiane");
 
         Optional<Role> finalRoleAdminOptional = roleAdminOptional;
         userAdminOptional.ifPresentOrElse(
