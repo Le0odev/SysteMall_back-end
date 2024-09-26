@@ -85,12 +85,9 @@ public class SalesService {
             total = total.subtract(discountAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
         }
 
-        // Captura o horário atual com o fuso de São Paulo
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
-        sale.setSaleDate(zonedDateTime.toLocalDateTime()); // Define a data da venda
-
         // Cria a venda
         Sales sale = new Sales();
+        sale.setSaleDate(LocalDateTime.now());
         sale.setSaleItems(saleItems);
         sale.setSaleTotals(total);
         sale.setDiscount(discount);
