@@ -11,9 +11,9 @@ public class SysteMallBackEndApplication {
 
     @PostConstruct
     public void init() {
-        // Define o fuso horário com -3 horas de diferença em relação ao padrão UTC
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT-3"));
-        System.out.println("Fuso horário definido para GMT-3");
+        // Define o fuso horário como "America/Sao_Paulo"
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
+        System.out.println("Fuso horário definido para America/Sao_Paulo (Horário de Brasília)");
     }
 
     public static void main(String[] args) {
