@@ -47,10 +47,14 @@ public class SalesService {
             if (itemDTO.getWeight() == null || itemDTO.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new CustomException("O peso do produto a granel não está especificado ou é inválido");
             }
-            BigDecimal weightInKg = itemDTO.getWeight().divide(BigDecimal.valueOf(1000), SCALE, ROUND_MODE);
-            subtotal = product.getProductPrice().multiply(weightInKg).setScale(SCALE, ROUND_MODE);
-
-            if (product.getEstoquePeso().setScale(SCALE, ROUND_MODE).compareTo(weightInKg) < 0) {
+            // Calcular o peso em KG sem arredondamento intermediário
+            BigDecimal weightInKg = itemDTO.getWeight().divide(BigDecimal.valueOf(1000), 10, ROUND_MODE); // Maior precisão aqui
+            subtotal = product.getProductPrice().multiply(weightInKg); // Sem arredondamento intermediário
+        
+            // Arredondar o subtotal apenas ao final do cálculo
+            subtotal = subtotal.setScale(SCALE, ROUND_MODE);
+        
+            if (product.getEstoquePeso().compareTo(weightInKg) < 0) {
                 throw new CustomException("Estoque insuficiente para o produto a granel");
             }
             product.setEstoquePeso(product.getEstoquePeso().subtract(weightInKg).setScale(SCALE, ROUND_MODE));
