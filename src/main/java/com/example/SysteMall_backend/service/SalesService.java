@@ -33,77 +33,77 @@ public class SalesService {
 
 
     public SalesDTO createSale(CreateSaleRequest request) {
-    BigDecimal total = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-    final int SCALE = 2;
-    final RoundingMode ROUND_MODE = RoundingMode.HALF_UP;
+        BigDecimal total = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 
-    List<SaleItem> saleItems = new ArrayList<>();
-    for (SaleItemDTO itemDTO : request.getItemsSale()) {
-        Product product = productRepository.findById(itemDTO.getProductId())
-                .orElseThrow(() -> new CustomException("Produto não encontrado"));
+        List<SaleItem> saleItems = new ArrayList<>();
+        for (SaleItemDTO itemDTO : request.getItemsSale()) {
+            Product product = productRepository.findById(itemDTO.getProductId())
+                    .orElseThrow(() -> new CustomException("Produto não encontrado"));
 
-        BigDecimal subtotal = BigDecimal.ZERO.setScale(SCALE, ROUND_MODE);
-        if (Boolean.TRUE.equals(itemDTO.getIsBulk())) {
-            if (itemDTO.getWeight() == null || itemDTO.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
-                throw new CustomException("O peso do produto a granel não está especificado ou é inválido");
-            }
-            // Calcular o peso em KG sem arredondamento intermediário
-            BigDecimal weightInKg = itemDTO.getWeight().divide(BigDecimal.valueOf(1000), 10, ROUND_MODE); // Maior precisão aqui
-            subtotal = product.getProductPrice().multiply(weightInKg); // Sem arredondamento intermediário
-        
-            // Arredondar o subtotal apenas ao final do cálculo
-            subtotal = subtotal.setScale(SCALE, ROUND_MODE);
-        
-            if (product.getEstoquePeso().compareTo(weightInKg) < 0) {
-                throw new CustomException("Estoque insuficiente para o produto a granel");
-            }
-            product.setEstoquePeso(product.getEstoquePeso().subtract(weightInKg).setScale(SCALE, ROUND_MODE));
-        } else {
-            if (itemDTO.getQuantity() == null || itemDTO.getQuantity() <= 0) {
-                throw new CustomException("A quantidade do produto não está especificada ou é inválida");
-            }
-            subtotal = product.getProductPrice()
-                              .multiply(BigDecimal.valueOf(itemDTO.getQuantity()))
-                              .setScale(SCALE, ROUND_MODE);
+            BigDecimal subtotal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+            if (Boolean.TRUE.equals(itemDTO.getIsBulk())) {
+                if (itemDTO.getWeight() == null || itemDTO.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new CustomException("O peso do produto a granel não está especificado ou é inválido");
+                }
+                // Corrigindo o cálculo para produtos a granel (considerando o peso em gramas e preço por kg)
+                BigDecimal weightInKg = itemDTO.getWeight().divide(BigDecimal.valueOf(1000), 2, BigDecimal.ROUND_HALF_UP);
+                subtotal = product.getProductPrice().multiply(weightInKg).setScale(2, BigDecimal.ROUND_HALF_UP);
 
-            if (product.getProductQuantity() < itemDTO.getQuantity()) {
-                throw new CustomException("Estoque insuficiente para o produto");
+                // Atualiza o estoque para produtos a granel
+                if (product.getEstoquePeso().compareTo(weightInKg) < 0) {
+                    throw new CustomException("Estoque insuficiente para o produto a granel");
+                }
+                product.setEstoquePeso(product.getEstoquePeso().subtract(weightInKg).setScale(2, BigDecimal.ROUND_HALF_UP));
+            } else {
+                if (itemDTO.getQuantity() == null || itemDTO.getQuantity() <= 0) {
+                    throw new CustomException("A quantidade do produto não está especificada ou é inválida");
+                }
+                subtotal = product.getProductPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+                // Atualiza o estoque para produtos em unidades
+                if (product.getProductQuantity() < itemDTO.getQuantity()) {
+                    throw new CustomException("Estoque insuficiente para o produto");
+                }
+                product.setProductQuantity(product.getProductQuantity() - itemDTO.getQuantity());
             }
-            product.setProductQuantity(product.getProductQuantity() - itemDTO.getQuantity());
+
+            total = total.add(subtotal).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+            SaleItem saleItem = new SaleItem();
+            saleItem.setProduct(product);
+            saleItem.setProductPrice(product.getProductPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            saleItem.setQuantity(itemDTO.getQuantity());
+            saleItem.setWeight(itemDTO.getWeight());
+            saleItem.setSubtotal(subtotal);
+            saleItems.add(saleItem);
         }
 
-        total = total.add(subtotal).setScale(SCALE, ROUND_MODE);
+        // Aplica o desconto percentual se fornecido
+        BigDecimal discount = request.getDiscount() != null ? request.getDiscount() : BigDecimal.ZERO;
+        if (discount.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal discountAmount = total.multiply(discount).divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_UP);
+            total = total.subtract(discountAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
 
-        SaleItem saleItem = new SaleItem();
-        saleItem.setProduct(product);
-        saleItem.setProductPrice(product.getProductPrice().setScale(SCALE, ROUND_MODE));
-        saleItem.setQuantity(itemDTO.getQuantity());
-        saleItem.setWeight(itemDTO.getWeight());
-        saleItem.setSubtotal(subtotal);
-        saleItems.add(saleItem);
+        // Cria a venda
+        Sales sale = new Sales();
+        sale.setSaleDate(LocalDateTime.now());
+        sale.setSaleItems(saleItems);
+        sale.setSaleTotals(total);
+        sale.setDiscount(discount);
+        sale.setMethodPayment(request.getMethodPayment() != null ? request.getMethodPayment() : "Não especificado");
+
+        saleItems.forEach(item -> item.setSale(sale));
+
+        // Salva a venda no banco de dados
+        Sales savedSale = salesRepository.save(sale);
+
+        // Atualiza o produto no banco de dados
+        productRepository.saveAll(saleItems.stream().map(SaleItem::getProduct).collect(Collectors.toList()));
+
+        // Mapeia a venda para DTO e retorna
+        return mapToDTO(savedSale);
     }
-
-    BigDecimal discount = request.getDiscount() != null ? request.getDiscount() : BigDecimal.ZERO;
-    if (discount.compareTo(BigDecimal.ZERO) > 0) {
-        BigDecimal discountAmount = total.multiply(discount).divide(BigDecimal.valueOf(100), SCALE, ROUND_MODE);
-        total = total.subtract(discountAmount).setScale(SCALE, ROUND_MODE);
-    }
-
-    Sales sale = new Sales();
-    sale.setSaleDate(LocalDateTime.now());
-    sale.setSaleItems(saleItems);
-    sale.setSaleTotals(total);
-    sale.setDiscount(discount);
-    sale.setMethodPayment(request.getMethodPayment() != null ? request.getMethodPayment() : "Não especificado");
-
-    saleItems.forEach(item -> item.setSale(sale));
-
-    Sales savedSale = salesRepository.save(sale);
-    productRepository.saveAll(saleItems.stream().map(SaleItem::getProduct).collect(Collectors.toList()));
-
-    return mapToDTO(savedSale);
-}
-
 
 
     public Long getLastSaleId() {
