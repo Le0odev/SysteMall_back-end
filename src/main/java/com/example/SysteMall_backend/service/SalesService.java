@@ -32,7 +32,7 @@ public class SalesService {
     }
 
 
-    public SalesDTO createSale(CreateSaleRequest request) {
+     public SalesDTO createSale(CreateSaleRequest request) {
         BigDecimal total = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 
         List<SaleItem> saleItems = new ArrayList<>();
@@ -41,24 +41,49 @@ public class SalesService {
                     .orElseThrow(() -> new CustomException("Produto não encontrado"));
 
             BigDecimal subtotal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+
             if (Boolean.TRUE.equals(itemDTO.getIsBulk())) {
                 if (itemDTO.getWeight() == null || itemDTO.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new CustomException("O peso do produto a granel não está especificado ou é inválido");
                 }
-                // Corrigindo o cálculo para produtos a granel (considerando o peso em gramas e preço por kg)
-                BigDecimal weightInKg = itemDTO.getWeight().divide(BigDecimal.valueOf(1000), 2, BigDecimal.ROUND_HALF_UP);
-                subtotal = product.getProductPrice().multiply(weightInKg).setScale(2, BigDecimal.ROUND_HALF_UP);
 
-                // Atualiza o estoque para produtos a granel
-                if (product.getEstoquePeso().compareTo(weightInKg) < 0) {
+                // Validação adicional para peso máximo razoável (exemplo: 1000kg)
+                if (itemDTO.getWeight().compareTo(BigDecimal.valueOf(1000000)) > 0) { // 1000000g = 1000kg
+                    throw new CustomException("Peso do produto excede o limite máximo permitido");
+                }
+
+                // Conversão de gramas para kg com maior precisão
+                BigDecimal weightInKg = itemDTO.getWeight()
+                        .divide(BigDecimal.valueOf(1000), 4, BigDecimal.ROUND_HALF_UP);
+
+                // Log para depuração
+                System.out.println("Peso em gramas: " + itemDTO.getWeight());
+                System.out.println("Peso em kg: " + weightInKg);
+                System.out.println("Preço do produto: " + product.getProductPrice());
+
+                // Cálculo do subtotal mantendo a precisão intermediária
+                subtotal = product.getProductPrice()
+                        .multiply(weightInKg)
+                        .setScale(4, BigDecimal.ROUND_HALF_UP) // Mantemos 4 casas decimais no cálculo intermediário
+                        .setScale(2, BigDecimal.ROUND_HALF_UP); // Resultado final com 2 casas decimais
+
+                System.out.println("Subtotal calculado: " + subtotal);
+
+                // Verificação de estoque com maior precisão
+                if (product.getEstoquePeso().setScale(4, BigDecimal.ROUND_HALF_UP).compareTo(weightInKg) < 0) {
                     throw new CustomException("Estoque insuficiente para o produto a granel");
                 }
-                product.setEstoquePeso(product.getEstoquePeso().subtract(weightInKg).setScale(2, BigDecimal.ROUND_HALF_UP));
+
+                product.setEstoquePeso(product.getEstoquePeso()
+                        .subtract(weightInKg)
+                        .setScale(4, BigDecimal.ROUND_HALF_UP));
             } else {
                 if (itemDTO.getQuantity() == null || itemDTO.getQuantity() <= 0) {
                     throw new CustomException("A quantidade do produto não está especificada ou é inválida");
                 }
-                subtotal = product.getProductPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_UP);
+                subtotal = product.getProductPrice()
+                        .multiply(BigDecimal.valueOf(itemDTO.getQuantity()))
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
 
                 // Atualiza o estoque para produtos em unidades
                 if (product.getProductQuantity() < itemDTO.getQuantity()) {
@@ -81,7 +106,9 @@ public class SalesService {
         // Aplica o desconto percentual se fornecido
         BigDecimal discount = request.getDiscount() != null ? request.getDiscount() : BigDecimal.ZERO;
         if (discount.compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal discountAmount = total.multiply(discount).divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal discountAmount = total
+                    .multiply(discount)
+                    .divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_UP);
             total = total.subtract(discountAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
         }
 
@@ -99,7 +126,9 @@ public class SalesService {
         Sales savedSale = salesRepository.save(sale);
 
         // Atualiza o produto no banco de dados
-        productRepository.saveAll(saleItems.stream().map(SaleItem::getProduct).collect(Collectors.toList()));
+        productRepository.saveAll(saleItems.stream()
+                .map(SaleItem::getProduct)
+                .collect(Collectors.toList()));
 
         // Mapeia a venda para DTO e retorna
         return mapToDTO(savedSale);
